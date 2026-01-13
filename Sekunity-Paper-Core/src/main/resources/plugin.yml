@@ -1,0 +1,17 @@
+name: Sekunity-Paper-Core
+author: Sekuramis | Jannik
+version: 1.0-SNAPSHOT
+api-version: 1.21.10
+depend:
+  - LuckPerms
+  - packetevents
+
+main: eu.sekunity.paper.SekunityPaperCore
+
+commands:
+  nickpool:
+    usage: /nickpool import <uuid> [fakename]
+
+permissions:
+  sekunity.nickpool.admin:
+    default: op

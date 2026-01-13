@@ -1,0 +1,13 @@
+name: Sekunity-Test
+main: eu.sekunity.test.SekunityTestPlugin
+version: 1.0-SNAPSHOT
+api-version: 1.21.10
+depend: [Sekunity-Paper-Core]
+
+commands:
+  nickme:
+    description: Nick dich selbst
+  mynick:
+    description: Zeigt deinen Nick
+  unnickme:
+    description: Unnick dich selbst
