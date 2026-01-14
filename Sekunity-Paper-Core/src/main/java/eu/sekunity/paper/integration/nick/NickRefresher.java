@@ -10,7 +10,7 @@ import org.bukkit.plugin.Plugin;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPlayerInfoRemove;
 
-import eu.sekunity.api.service.NickIdentity;
+import eu.sekunity.api.service.nick.NickIdentity;
 
 /**
  * © Copyright 12.01.2026 - 19:55 – Urheberrechtshinweis Alle Inhalte dieser Software, insbesondere der Quellcode, sind
@@ -36,29 +36,16 @@ public final class NickRefresher
 		UUID real = id.realUuid();
 		UUID fake = id.fakeUuid();
 
-		log("applyNick target=" + target.getName() + " real=" + real + " fake=" + fake + " fakeName=" + id.fakeName());
-
 		Bukkit.getScheduler().runTask(plugin, () -> {
-			int viewers = 0;
-
 			for (Player viewer : Bukkit.getOnlinePlayers())
 			{
 				if (viewer.equals(target))
-				{
-					log("applyNick skip self viewer=" + viewer.getName());
 					continue;
-				}
 
-				viewers++;
-
-				log("applyNick viewer=" + viewer.getName() + " -> sendRemove(real+fake) + hide");
 				sendRemove(viewer, real);
 				sendRemove(viewer, fake);
-
 				viewer.hidePlayer(plugin, target);
 			}
-
-			log("applyNick viewersAffected=" + viewers + " scheduling show in 2 ticks");
 
 			Bukkit.getScheduler().runTaskLater(plugin, () -> {
 				for (Player viewer : Bukkit.getOnlinePlayers())
@@ -66,41 +53,23 @@ public final class NickRefresher
 					if (viewer.equals(target))
 						continue;
 
-					log("applyNick viewer=" + viewer.getName() + " -> show");
 					viewer.showPlayer(plugin, target);
 				}
 			}, 2L);
 		});
 	}
 
-	public void removeNick(Player target, NickIdentity id)
+	public void removeNick(Player target)
 	{
-		UUID real = id.realUuid();
-		UUID fake = id.fakeUuid();
-
-		log("removeNick target=" + target.getName() + " real=" + real + " fake=" + fake);
-
 		Bukkit.getScheduler().runTask(plugin, () -> {
-			int viewers = 0;
-
 			for (Player viewer : Bukkit.getOnlinePlayers())
 			{
 				if (viewer.equals(target))
-				{
-					log("removeNick skip self viewer=" + viewer.getName());
 					continue;
-				}
 
-				viewers++;
-
-				log("removeNick viewer=" + viewer.getName() + " -> sendRemove(fake+real) + hide");
-				sendRemove(viewer, fake);
-				sendRemove(viewer, real);
-
+				sendRemove(viewer, target.getUniqueId());
 				viewer.hidePlayer(plugin, target);
 			}
-
-			log("removeNick viewersAffected=" + viewers + " scheduling show in 2 ticks");
 
 			Bukkit.getScheduler().runTaskLater(plugin, () -> {
 				for (Player viewer : Bukkit.getOnlinePlayers())
@@ -108,7 +77,6 @@ public final class NickRefresher
 					if (viewer.equals(target))
 						continue;
 
-					log("removeNick viewer=" + viewer.getName() + " -> show");
 					viewer.showPlayer(plugin, target);
 				}
 			}, 2L);

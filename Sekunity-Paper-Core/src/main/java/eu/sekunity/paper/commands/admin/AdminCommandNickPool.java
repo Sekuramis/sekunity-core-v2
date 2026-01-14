@@ -10,7 +10,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import eu.sekunity.paper.service.nick.NickPoolImporter;
+import eu.sekunity.api.service.nick.NickPoolImporter;
 
 /**
  * © Copyright 12.01.2026 - 19:13 – Urheberrechtshinweis Alle Inhalte dieser Software, insbesondere der Quellcode, sind

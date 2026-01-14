@@ -1,0 +1,9 @@
+async:
+  threads: 4
+
+database:
+  enabled: true
+  jdbcUrl: "jdbc:mariadb://5.231.21.179:3306/sekunity?useUnicode=true&characterEncoding=utf8mb4"
+  username: "sekunity"
+  password: "2L6p@9j/_voHKyfR"
+  poolSize: 10

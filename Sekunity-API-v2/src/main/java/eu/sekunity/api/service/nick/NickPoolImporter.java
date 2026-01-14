@@ -1,10 +1,9 @@
-package eu.sekunity.paper.service.nick;
-
-import eu.sekunity.api.service.SkinProfile;
+package eu.sekunity.api.service.nick;
 
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
+
 /**
  * © Copyright 12.01.2026 - 19:15 – Urheberrechtshinweis Alle Inhalte dieser Software, insbesondere der Quellcode, sind
  * urheberrechtlich geschützt. Das Urheberrecht liegt, soweit nicht ausdrücklich anders gekennzeichnet, bei @author

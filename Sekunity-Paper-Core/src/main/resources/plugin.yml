@@ -11,6 +11,11 @@ main: eu.sekunity.paper.SekunityPaperCore
 commands:
   nickpool:
     usage: /nickpool import <uuid> [fakename]
+  nick:
+    usage: /nick
+    aliases:
+      - nickname
+      - nicks
 
 permissions:
   sekunity.nickpool.admin:

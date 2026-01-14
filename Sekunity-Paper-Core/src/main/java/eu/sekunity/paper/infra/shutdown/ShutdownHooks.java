@@ -3,8 +3,8 @@ package eu.sekunity.paper.infra.shutdown;
 import java.util.Optional;
 
 import eu.sekunity.api.database.Database;
+import eu.sekunity.api.service.nick.NickCache;
 import eu.sekunity.paper.infra.async.AsyncExecutor;
-import eu.sekunity.paper.service.nick.NickCache;
 
 /**
  * © Copyright 11.01.2026 - 17:15 – Urheberrechtshinweis Alle Inhalte dieser Software, insbesondere der Quellcode, sind
@@ -18,7 +18,7 @@ public final class ShutdownHooks
 {
 	private final AsyncExecutor async;
 	private final Optional<Database> db;
-	private final eu.sekunity.paper.service.nick.NickCache nickCache;
+	private final NickCache nickCache;
 
 	public ShutdownHooks(AsyncExecutor async, Optional<Database> db, NickCache nickCache)
 	{

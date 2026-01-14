@@ -1,11 +1,4 @@
-package eu.sekunity.paper.service.nick;
-
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-
-import eu.sekunity.api.service.SkinProfile;
+package eu.sekunity.api.service.nick;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -14,6 +7,13 @@ import java.net.http.HttpResponse;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
+import eu.sekunity.api.service.SkinProfile;
 
 /**
  * © Copyright 12.01.2026 - 19:09 – Urheberrechtshinweis Alle Inhalte dieser Software, insbesondere der Quellcode, sind

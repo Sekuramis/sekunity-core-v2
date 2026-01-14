@@ -1,10 +1,8 @@
-package eu.sekunity.paper.service.nick;
+package eu.sekunity.api.service.nick;
 
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-
-import eu.sekunity.api.service.NickIdentity;
 
 /**
  * © Copyright 11.01.2026 - 19:58 – Urheberrechtshinweis Alle Inhalte dieser Software, insbesondere der Quellcode, sind

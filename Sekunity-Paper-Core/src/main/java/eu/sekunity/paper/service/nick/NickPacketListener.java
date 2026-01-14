@@ -18,9 +18,9 @@ import com.github.retrooper.packetevents.protocol.player.UserProfile;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPlayerInfoRemove;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPlayerInfoUpdate;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSpawnEntity;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSpawnPlayer;
 
-import eu.sekunity.api.service.NickIdentity;
+import eu.sekunity.api.service.nick.NickCache;
+import eu.sekunity.api.service.nick.NickIdentity;
 
 /**
  * © Copyright 11.01.2026 - 20:05 – Urheberrechtshinweis Alle Inhalte dieser Software, insbesondere der Quellcode, sind
@@ -105,7 +105,7 @@ public final class NickPacketListener extends PacketListenerAbstract
 				continue;
 			}
 
-			if (viewer != null && !visibility .shouldSeeNick(viewer, realUuid))
+			if (viewer != null && !visibility.shouldSeeNick(viewer, realUuid))
 			{
 				log(event, "PLAYER_INFO_UPDATE keep REAL viewer=" + viewer + " target=" + realUuid);
 				out.add(e);
@@ -113,26 +113,21 @@ public final class NickPacketListener extends PacketListenerAbstract
 			}
 
 			NickIdentity ni = opt.get();
+			if (ni.fakeUuid() == null || ni.fakeName() == null || ni.skinValue() == null || ni.skinSignature() == null)
+			{
+				out.add(e);
+				continue;
+			}
 
-			log(event, "PLAYER_INFO_UPDATE rewrite viewer=" + viewer + " real=" + realUuid + " -> fake=" + ni.fakeUuid() + " fakeName=" + ni.fakeName());
+			log(event, "PLAYER_INFO_UPDATE rewrite viewer=" + viewer + " real=" + realUuid + " -> fake=" + ni.fakeUuid()
+					+ " fakeName=" + ni.fakeName());
 
-			UserProfile fakeProfile = new UserProfile(
-					ni.fakeUuid(),
-					ni.fakeName(),
-					List.of(new TextureProperty("textures", ni.skinValue(), ni.skinSignature()))
-			);
+			UserProfile fakeProfile = new UserProfile(ni.fakeUuid(), ni.fakeName(),
+					List.of(new TextureProperty("textures", ni.skinValue(), ni.skinSignature())));
 
-			WrapperPlayServerPlayerInfoUpdate.PlayerInfo replaced =
-					new WrapperPlayServerPlayerInfoUpdate.PlayerInfo(
-							fakeProfile,
-							e.isListed(),
-							e.getLatency(),
-							e.getGameMode(),
-							e.getDisplayName(),
-							e.getChatSession(),
-							e.getListOrder(),
-							e.isShowHat()
-					);
+			WrapperPlayServerPlayerInfoUpdate.PlayerInfo replaced = new WrapperPlayServerPlayerInfoUpdate.PlayerInfo(
+					fakeProfile, e.isListed(), e.getLatency(), e.getGameMode(), e.getDisplayName(), e.getChatSession(),
+					e.getListOrder(), e.isShowHat());
 
 			out.add(replaced);
 			changed = true;
@@ -171,7 +166,14 @@ public final class NickPacketListener extends PacketListenerAbstract
 					continue;
 				}
 
-				log(event, "PLAYER_INFO_REMOVE expand viewer=" + viewer + " id=" + id + " -> remove(real+fake) real=" + ni.realUuid() + " fake=" + ni.fakeUuid());
+				if (ni.fakeUuid() == null)
+				{
+					out.add(id);
+					continue;
+				}
+
+				log(event, "PLAYER_INFO_REMOVE expand viewer=" + viewer + " id=" + id + " -> remove(real+fake) real="
+						+ ni.realUuid() + " fake=" + ni.fakeUuid());
 				out.add(ni.realUuid());
 				out.add(ni.fakeUuid());
 				changed = true;
@@ -190,7 +192,14 @@ public final class NickPacketListener extends PacketListenerAbstract
 					continue;
 				}
 
-				log(event, "PLAYER_INFO_REMOVE expand viewer=" + viewer + " id=" + id + " -> remove(real+fake) real=" + ni.realUuid() + " fake=" + ni.fakeUuid());
+				if (ni.fakeUuid() == null)
+				{
+					out.add(id);
+					continue;
+				}
+
+				log(event, "PLAYER_INFO_REMOVE expand viewer=" + viewer + " id=" + id + " -> remove(real+fake) real="
+						+ ni.realUuid() + " fake=" + ni.fakeUuid());
 				out.add(ni.realUuid());
 				out.add(ni.fakeUuid());
 				changed = true;
@@ -217,8 +226,7 @@ public final class NickPacketListener extends PacketListenerAbstract
 		try
 		{
 			type = wrapper.getEntityType();
-		}
-		catch (Throwable t)
+		} catch (Throwable t)
 		{
 			log(event, "SPAWN_ENTITY failed read type: " + t.getClass().getSimpleName() + " " + t.getMessage());
 			return;
@@ -228,8 +236,7 @@ public final class NickPacketListener extends PacketListenerAbstract
 		try
 		{
 			typeName = type.getName().toString();
-		}
-		catch (Throwable ignored)
+		} catch (Throwable ignored)
 		{
 			typeName = String.valueOf(type);
 		}
@@ -238,8 +245,7 @@ public final class NickPacketListener extends PacketListenerAbstract
 		try
 		{
 			optUuid = wrapper.getUUID();
-		}
-		catch (Throwable t)
+		} catch (Throwable t)
 		{
 			log(event, "SPAWN_ENTITY failed read uuid: " + t.getClass().getSimpleName() + " " + t.getMessage());
 			return;
@@ -262,31 +268,35 @@ public final class NickPacketListener extends PacketListenerAbstract
 
 		Optional<NickIdentity> optNick = cache.getIfEnabled(spawnUuid);
 		if (optNick.isEmpty())
+			optNick = cache.getIfEnabledByFake(spawnUuid);
+
+		if (optNick.isEmpty())
 		{
 			log(event, "SPAWN_ENTITY PLAYER cache MISS for uuid=" + spawnUuid);
 			return;
 		}
 
-		if (viewer != null && !visibility.shouldSeeNick(viewer, spawnUuid))
+		NickIdentity ni = optNick.get();
+		if (ni.fakeUuid() == null)
+			return;
+
+		if (viewer != null && !visibility.shouldSeeNick(viewer, ni.realUuid()))
 		{
-			log(event, "SPAWN_ENTITY PLAYER keep REAL viewer=" + viewer + " target=" + spawnUuid);
+			log(event, "SPAWN_ENTITY PLAYER keep REAL viewer=" + viewer + " target=" + ni.realUuid());
 			return;
 		}
 
-		NickIdentity ni = optNick.get();
 		log(event, "SPAWN_ENTITY PLAYER rewrite viewer=" + viewer + " uuid " + spawnUuid + " -> " + ni.fakeUuid());
 
 		try
 		{
 			wrapper.setUUID(Optional.of(ni.fakeUuid()));
 			wrapper.write();
-		}
-		catch (Throwable t)
+		} catch (Throwable t)
 		{
 			log(event, "SPAWN_ENTITY PLAYER setUUID failed: " + t.getClass().getSimpleName() + " " + t.getMessage());
 		}
 	}
-
 
 	private void log(PacketSendEvent event, String msg)
 	{
@@ -296,10 +306,13 @@ public final class NickPacketListener extends PacketListenerAbstract
 		String receiver = "?";
 		try
 		{
-			if (event.getPlayer() != null)
-				receiver = Bukkit.getPlayer(event.getUser().getUUID()) != null ? Bukkit.getPlayer(event.getUser().getUUID()).getName() : event.getUser().getUUID().toString();
-		}
-		catch (Throwable ignored)
+			var user = event.getUser();
+			if (user != null)
+			{
+				var p = Bukkit.getPlayer(user.getUUID());
+				receiver = (p != null) ? p.getName() : user.getUUID().toString();
+			}
+		} catch (Throwable ignored)
 		{
 		}
 
@@ -313,9 +326,9 @@ public final class NickPacketListener extends PacketListenerAbstract
 			var user = event.getUser();
 			if (user != null)
 				return user.getUUID();
+		} catch (Throwable ignored)
+		{
 		}
-		catch (Throwable ignored) {}
 		return null;
 	}
-
 }

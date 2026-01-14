@@ -2,7 +2,7 @@ package eu.sekunity.api;
 
 import eu.sekunity.api.platform.PaperAPI;
 import eu.sekunity.api.platform.VelocityAPI;
-import eu.sekunity.api.service.NickService;
+import eu.sekunity.api.service.nick.NickService;
 import eu.sekunity.api.service.ProfileService;
 
 /**

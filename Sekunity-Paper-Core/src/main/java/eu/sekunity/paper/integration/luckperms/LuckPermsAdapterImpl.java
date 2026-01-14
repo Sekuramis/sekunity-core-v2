@@ -97,6 +97,34 @@ public class LuckPermsAdapterImpl implements LuckPermsAdapter
 		return 0;
 	}
 
+	@Override
+	public CompletableFuture<Integer> weightAsync(UUID uuid)
+	{
+		return CompletableFuture.supplyAsync(() -> {
+			try
+			{
+				LuckPerms lp = LuckPermsProvider.get();
+				var user = lp.getUserManager().getUser(uuid);
+				if (user == null)
+					return 0;
+
+				String primary = user.getPrimaryGroup();
+				Group g = lp.getGroupManager().getGroup(primary);
+
+				int w = 0;
+				if (g != null && g.getWeight().isPresent())
+					w = g.getWeight().getAsInt();
+
+				weightCache.put(uuid, w);
+				return w;
+			}
+			catch (Throwable t)
+			{
+				return 0;
+			}
+		}, executor);
+	}
+
 	public void invalidate(UUID playerUuid)
 	{
 		weightCache.remove(playerUuid);

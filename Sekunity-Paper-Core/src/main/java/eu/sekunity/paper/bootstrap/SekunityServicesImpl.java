@@ -1,7 +1,7 @@
 package eu.sekunity.paper.bootstrap;
 
 import eu.sekunity.api.SekunityServices;
-import eu.sekunity.api.service.NickService;
+import eu.sekunity.api.service.nick.NickService;
 import eu.sekunity.api.service.ProfileService;
 
 /**
