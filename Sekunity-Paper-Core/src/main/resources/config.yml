@@ -7,3 +7,13 @@ database:
   username: "sekunity"
   password: "2L6p@9j/_voHKyfR"
   poolSize: 10
+
+replay:
+  enabled: true
+  mode: PLAYBACK # RECORD oder PLAYBACK
+  rollingMinutes: 15
+  export:
+    radius: 96
+    yRange: 48
+    defaultBackSeconds: 120
+    defaultForwardSeconds: 30
